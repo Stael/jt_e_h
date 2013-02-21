@@ -32,12 +32,7 @@ public class CharFrequency implements Comparable<CharFrequency> {
 
     @Override
     public int compareTo(CharFrequency cf) {
-        if(nb == cf.getNb()) {
-            return 0;
-        }
-        else {
-            return nb > cf.getNb() ? 1 : -1;
-        }
+        return nb - cf.getNb();
     }
 
     @Override
@@ -49,7 +44,7 @@ public class CharFrequency implements Comparable<CharFrequency> {
             return "Character : '\\t' - \t\t\t Frequence : " + nb + " - \t\t\t Code : " + code;
         }
         else {
-            return "Character : '\\ " + character + "' - \t\t\t Frequence : " + nb + " - \t\t\t Code : " + code;
+            return "Character : '" + character + "' - \t\t\t Frequence : " + nb + " - \t\t\t Code : " + code;
         }
     }
 }
