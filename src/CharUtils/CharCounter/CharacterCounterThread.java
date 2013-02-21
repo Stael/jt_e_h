@@ -1,8 +1,11 @@
-/**
+package CharUtils.CharCounter; /**
  * User: thibaultramires
  * Date: 20/02/13
  * Time: 20:44
  */
+
+import CharUtils.CharFrequency;
+import ThreadUtils.NotifyingThread;
 
 import java.util.HashMap;
 
@@ -11,18 +14,6 @@ public class CharacterCounterThread extends NotifyingThread {
     private String s = "";
     //private HashMap<Character, Integer> characterMap = new HashMap<Character, Integer>();
     private HashMap<Character, CharFrequency> characterMap = new HashMap<Character, CharFrequency>();
-
-    public class CharFrequency {
-        private int nb = 1;
-
-        public void up() {
-            nb++;
-        }
-
-        public int getNb() {
-            return nb;
-        }
-    }
 
     public CharacterCounterThread(String s) {
         this.s = s;
@@ -42,7 +33,7 @@ public class CharacterCounterThread extends NotifyingThread {
             if (t != null) {
                 t.up();
             } else {
-                t = new CharFrequency();
+                t = new CharFrequency(c);
                 characterMap.put(c, t);
             }
 

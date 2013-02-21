@@ -1,17 +1,22 @@
-/**
+package CharUtils.CharCounter; /**
  * User: thibaultramires
  * Date: 20/02/13
  * Time: 20:29
  */
 
+import CharUtils.CharFrequency;
+import HuffmanTree.TreeBuilder;
+import ThreadUtils.ThreadCompleteListener;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 public class CharacterCounter implements ThreadCompleteListener {
     String s = "";
     int nbThread = Runtime.getRuntime().availableProcessors();
     long start = 0;
-    HashMap<Character, Integer> characterMap = new HashMap<Character, Integer>();
+    HashMap<Character, CharFrequency> characterMap = new HashMap<Character, CharFrequency>();
 
 
     public CharacterCounter(String s) {
@@ -58,26 +63,32 @@ public class CharacterCounter implements ThreadCompleteListener {
             //printNbCharInDictionnary();
 
             System.out.println("Exec Time - Advanced : " + (System.currentTimeMillis() - start) + " ms");
-            System.out.println("Ram used : " + Runtime.getRuntime().totalMemory() / 1000000 + " M");
+            System.out.println("Used Memory: "+ (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024*1024) + " Mo");
+
+            TreeSet<CharFrequency> t = TreeBuilder.buildTree(characterMap);
         }
 
     }
 
     private void printNbCharInDictionnary() {
         int res = 0;
-        for (Map.Entry<Character, Integer> e : characterMap.entrySet()) {
-            res += e.getValue();
+        for (Map.Entry<Character, CharFrequency> e : characterMap.entrySet()) {
+            res += e.getValue().getNb();
         }
         System.out.println("Nb chars : " + res);
     }
 
     private void extractResults(CharacterCounterThread cct) {
-        HashMap<Character, CharacterCounterThread.CharFrequency> resultHm = cct.getCharacterMap();
-        for (Map.Entry<Character, CharacterCounterThread.CharFrequency> e : resultHm.entrySet()) {
-            if (characterMap.containsKey(e.getKey())) {
-                characterMap.put(e.getKey(), characterMap.get(e.getKey()) + e.getValue().getNb());
-            } else {
-                characterMap.put(e.getKey(), e.getValue().getNb());
+        HashMap<Character, CharFrequency> resultHm = cct.getCharacterMap();
+        for (Map.Entry<Character, CharFrequency> e : resultHm.entrySet()) {
+
+            CharFrequency cf = characterMap.get(e.getKey());
+
+            if(cf != null) {
+                cf.add(e.getValue().getNb());
+            }
+            else {
+                characterMap.put(e.getKey(), e.getValue());
             }
         }
     }

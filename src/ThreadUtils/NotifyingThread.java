@@ -1,4 +1,4 @@
-/**
+package ThreadUtils; /**
  * User: thibaultramires
  * Date: 17/02/13
  * Time: 18:18
