@@ -1,9 +1,11 @@
 package HuffmanTree;
 
 import CharUtils.CharFrequency;
-import HuffmanTree.HuffmanTree;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.TreeSet;
 
 /**
  * User: thibaultramires
@@ -36,7 +38,7 @@ public class TreeBuilder {
             pq.add(e.getValue());
         }
 
-        while(!pq.isEmpty()) {
+        while (!pq.isEmpty()) {
             CharFrequency cf = pq.poll();
             System.out.println(cf);
         }

@@ -1,4 +1,5 @@
-package CharUtils.CharCounter; /**
+package CharUtils.CharCounter;
+/**
  * User: thibaultramires
  * Date: 20/02/13
  * Time: 20:44

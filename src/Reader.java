@@ -4,7 +4,7 @@
  * Time: 20:17
  */
 
-import CharUtils.CharCounter.CharacterCounter;
+import CharUtils.CharCounter.CharCounter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -55,7 +55,7 @@ public class Reader {
             String res = new String(byteArray);
             //System.out.println("Initials chars : " + res.length());
 
-            CharacterCounter cc = new CharacterCounter(res, start);
+            CharCounter cc = new CharCounter(res, start);
             cc.countMulti();
 
             //System.out.println("Ram used : " + Runtime.getRuntime().totalMemory() / 1000000 + " M");

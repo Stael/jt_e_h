@@ -26,12 +26,11 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     }
 
     private void generateCode(String s) {
-        if(cf == null) {
+        if (cf == null) {
             left.generateCode(s + "0");
             right.generateCode(s + "1");
-        }
-        else {
-            cf.setCode(s);
+        } else {
+            cf.setByteCode(s);
         }
     }
 
@@ -41,7 +40,7 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     }
 
     private int frequency() {
-        return cf == null ? left.frequency()+right.frequency() : cf.getNb();
+        return cf == null ? left.frequency() + right.frequency() : cf.getNb();
     }
 
     public CharFrequency getCf() {
