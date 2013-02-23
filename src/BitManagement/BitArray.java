@@ -40,22 +40,19 @@ public class BitArray {
     }
 
     public void add(boolean bit) {
-        if (lastBit == 8) {
-            lastByte++;
-            lastBit = 0;
-            if (lastByte == bitArray.length) {
-                extendCapacity(2);
-            }
-        }
-        lastBit++;
-
         if (bit) {
-            bitArray[lastByte] = (byte) (bitArray[lastByte] | 1 << (Byte.SIZE - lastBit));
+            bitArray[lastByte] = (byte) (bitArray[lastByte] | 1 << (7 - lastBit));
+        }
+
+        lastByte = lastBit == 7 ? lastByte + 1 : lastByte;
+        lastBit =  lastBit == 7 ? 0 : lastBit + 1;
+
+        if (lastByte == bitArray.length) {
+            extendCapacity(2);
         }
     }
 
     private void extendCapacity(int extendCoef) {
-
         byte[] extendedBitArray = new byte[extendCoef * bitArray.length];
 
         for (int i = 0; i < bitArray.length; i++) {
@@ -67,16 +64,11 @@ public class BitArray {
 
     protected boolean isBitSet(int byteIndex, int bitIndex)
     {
-        try {
-            return (bitArray[byteIndex] & (1 << bitIndex)) != 0;
-        }
-        catch (Exception e) {
-            return false;
-        }
+        return (bitArray[byteIndex] & (1 << bitIndex)) != 0;
     }
 
     public int length() {
-        return lastByte*8 +lastBit;
+        return lastByte * 8 + lastBit ;
     }
 
     private void finalise() {
