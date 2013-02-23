@@ -19,6 +19,7 @@ import java.util.Map;
 public class CharCounter implements ThreadCompleteListener {
     private String s = "";
     private int nbThread = Runtime.getRuntime().availableProcessors();
+    private int remainingThreads = Runtime.getRuntime().availableProcessors();
     private long start = 0;
     private HashMap<Character, CharFrequency> characterMap = new HashMap<Character, CharFrequency>();
     private Encoder encoder;
@@ -45,13 +46,11 @@ public class CharCounter implements ThreadCompleteListener {
 
     public void countMulti() {
         if (start == 0) start = System.currentTimeMillis();
-        String ns;
         int stringLength = (int) Math.ceil(s.length() / nbThread);
-        int threadsToLaunch = nbThread;
 
-        for (int i = 0; i < threadsToLaunch; i++) {
+        for (int i = 0; i < nbThread; i++) {
             // Problème de la fin du dernier
-            ns = s.substring(i * stringLength, i + 1 == threadsToLaunch ? s.length() : i * stringLength + stringLength);
+            String ns = s.substring(i * stringLength, i + 1 == nbThread ? s.length() : i * stringLength + stringLength);
             CharCounterThread cct = new CharCounterThread(ns);
             cct.addListener(this);
             cct.start();

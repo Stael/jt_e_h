@@ -20,7 +20,7 @@ public class CharEncoder implements ThreadCompleteListener {
     private String textToEncode;
     private HashMap<Character, CharFrequency> characterMap;
     private long start = 0;
-    private BitArray encodedText = new BitArray(100);
+    private BitArray encodedText;
     private BitArray[] partialEncodedTexts = new BitArray[nbThread];
     private Encoder encoder;
 
@@ -42,10 +42,9 @@ public class CharEncoder implements ThreadCompleteListener {
         if (start == 0) start = System.currentTimeMillis();
 
         int stringLength = (int) Math.ceil(textToEncode.length() / nbThread);
-        int threadsToLaunch = nbThread;
 
-        for (int i = 0; i < threadsToLaunch; i++) {
-            String ns = textToEncode.substring(i * stringLength, i + 1 == threadsToLaunch ? textToEncode.length() : i * stringLength + stringLength);
+        for (int i = 0; i < nbThread; i++) {
+            String ns = textToEncode.substring(i * stringLength, i + 1 == nbThread ? textToEncode.length() : i * stringLength + stringLength);
             CharEncoderThread cet = new CharEncoderThread(ns, characterMap, i);
             cet.addListener(this);
             cet.start();
@@ -57,8 +56,12 @@ public class CharEncoder implements ThreadCompleteListener {
 
         remainingThreads--;
 
-
         if (remainingThreads == 0) {
+            int length = 0;
+            for(int i = 0; i < nbThread; i++) {
+                length += partialEncodedTexts[i].length();
+            }
+            encodedText = new BitArray(length);
             for(int i = 0; i < nbThread; i++) {
                 encodedText.add(partialEncodedTexts[i]);
             }
