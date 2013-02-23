@@ -4,13 +4,17 @@ package CharUtils.CharCounter; /**
  * Time: 20:29
  */
 
+import BitManagement.BitArray;
+import CharUtils.CharDecoder.CharDecoder;
+import CharUtils.CharEncoder.CharEncoder;
 import CharUtils.CharFrequency;
 import HuffmanTree.TreeBuilder;
 import ThreadUtils.ThreadCompleteListener;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class CharCounter implements ThreadCompleteListener {
     String s = "";
@@ -62,12 +66,59 @@ public class CharCounter implements ThreadCompleteListener {
         if (nbThread == 0) {
             //printNbCharInDictionnary();
 
-            TreeSet<CharFrequency> t = TreeBuilder.buildTree(characterMap);
+            printState("fin calcul nbr occurences");
 
-            System.out.println("Exec Time - Advanced : " + (System.currentTimeMillis() - start) + " ms");
-            System.out.println("Used Memory: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024) + " Mo");
+            TreeBuilder.buildTree(characterMap);
+
+            printState("fin génération arbre");
+
+            CharEncoder ce = new CharEncoder(s, 10, characterMap);
+
+            BitArray be = ce.encode();
+
+            System.out.println("Nb bits : " + be.length());
+
+
+            System.out.println("\n\n");
+
+            printState("fin encodage ");
+
+            try {
+                FileOutputStream out = new FileOutputStream("testfile");
+                out.write(be.toByteArray());
+            }
+            catch(Exception e) {
+                System.out.println("Yolo !");
+            }
+
+            printState("fin save fichier encodé ");
+
+            CharDecoder cd = new CharDecoder(be.toByteArray(), characterMap);
+            String res = cd.decode();
+
+            printState("fin décodage ");
+
+            try {
+                FileOutputStream out = new FileOutputStream("final");
+                out.write(res.getBytes());
+            }
+            catch(Exception e) {
+                System.out.println("Yolo !");
+            }
+
+            printState("fin save fichier décodé ");
+
+            printState("Fin ");
         }
 
+    }
+
+    private void printState(String status) {
+        System.out.println("Statut : " + status);
+        System.out.println("Exec Time - Advanced : " + (System.currentTimeMillis() - start) + " ms");
+        System.out.println("Used Memory: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024) + " Mo");
+        System.out.println();
+        start = System.currentTimeMillis();
     }
 
     private void printNbCharInDictionnary() {

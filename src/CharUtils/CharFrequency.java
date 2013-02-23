@@ -8,7 +8,7 @@ package CharUtils;
 public class CharFrequency implements Comparable<CharFrequency> {
     private int nb = 1;
     private char character;
-    private byte[] byteCode;
+    private String byteCode;
 
     public CharFrequency(char c) {
         this.character = c;
@@ -27,7 +27,15 @@ public class CharFrequency implements Comparable<CharFrequency> {
     }
 
     public void setByteCode(String code) {
-        this.byteCode = code.getBytes();
+        this.byteCode = code;
+    }
+
+    public String getByteCode() {
+        return byteCode;
+    }
+
+    public char getCharacter() {
+        return character;
     }
 
     @Override
