@@ -14,7 +14,7 @@ import java.util.TreeSet;
  */
 public class TreeBuilder {
 
-    public static TreeSet<CharFrequency> buildTree(HashMap<Character, CharFrequency> characterMap) {
+    public static void buildTree(HashMap<Character, CharFrequency> characterMap) {
 
         PriorityQueue<HuffmanTree> prioQueue = new PriorityQueue<HuffmanTree>();
         for (Map.Entry<Character, CharFrequency> e : characterMap.entrySet()) {
@@ -38,11 +38,11 @@ public class TreeBuilder {
             pq.add(e.getValue());
         }
 
+        /*
         while (!pq.isEmpty()) {
             CharFrequency cf = pq.poll();
             System.out.println(cf);
         }
-
-        return null;
+        */
     }
 }

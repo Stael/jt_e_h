@@ -31,10 +31,10 @@ public class BitExtractor extends BitArray {
             System.out.println("lololol");
         }
 
-        currentByte = currentBit == 8 ? currentByte + 1 : currentByte;
-        currentBit =  currentBit == 8 ? 0 : currentBit + 1;
+        string.append(this.isBitSet(currentByte, 7-currentBit) ? 1 : 0);
 
-        string.append(this.isBitSet(currentByte, 8-currentBit)?1:0);
+        currentByte = currentBit == 7 ? currentByte + 1 : currentByte;
+        currentBit =  currentBit == 7 ? 0 : currentBit + 1;
 
         return string.toString();
     }

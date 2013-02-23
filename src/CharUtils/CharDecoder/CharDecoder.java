@@ -37,7 +37,7 @@ public class CharDecoder {
             //bitArray.printState();
             CharFrequency cf = stringMap.get(binaryWord);
             if(cf != null) {
-                System.out.println(" new !! " + cf.getCharacter());
+                //System.out.println(" new !! " + cf.getCharacter());
                 bitArray.newString();
                 res.append(cf.getCharacter());
             }

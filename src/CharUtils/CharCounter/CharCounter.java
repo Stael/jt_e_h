@@ -76,10 +76,10 @@ public class CharCounter implements ThreadCompleteListener {
 
             BitArray be = ce.encode();
 
-            System.out.println("Nb bits : " + be.length());
+            //System.out.println("Nb bits : " + be.length());
 
 
-            System.out.println("\n\n");
+            //System.out.println("\n\n");
 
             printState("fin encodage ");
 
