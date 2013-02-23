@@ -8,28 +8,30 @@ import BitManagement.BitArray;
 import CharUtils.CharDecoder.CharDecoder;
 import CharUtils.CharEncoder.CharEncoder;
 import CharUtils.CharFrequency;
+import CharUtils.Encoder;
 import HuffmanTree.TreeBuilder;
 import ThreadUtils.ThreadCompleteListener;
 
 import java.io.FileOutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CharCounter implements ThreadCompleteListener {
-    String s = "";
-    int nbThread = Runtime.getRuntime().availableProcessors();
-    long start = 0;
-    HashMap<Character, CharFrequency> characterMap = new HashMap<Character, CharFrequency>();
+    private String s = "";
+    private int nbThread = Runtime.getRuntime().availableProcessors();
+    private long start = 0;
+    private HashMap<Character, CharFrequency> characterMap = new HashMap<Character, CharFrequency>();
+    private Encoder encoder;
 
 
     public CharCounter(String s) {
         this.s = s;
     }
 
-    public CharCounter(String s, long start) {
+    public CharCounter(String s, long start, Encoder encoder) {
         this.s = s;
         this.start = start;
+        this.encoder = encoder;
     }
 
     public void countMono() {
@@ -38,9 +40,7 @@ public class CharCounter implements ThreadCompleteListener {
 
         extractResults(cct);
 
-        printNbCharInDictionnary();
-
-        System.out.println("Final time : " + (System.currentTimeMillis() - start) + " ms");
+        encoder.postCountNumberOfCharacters(characterMap);
     }
 
     public void countMulti() {
@@ -64,61 +64,9 @@ public class CharCounter implements ThreadCompleteListener {
         extractResults(((CharCounterThread) thread));
 
         if (nbThread == 0) {
-            //printNbCharInDictionnary();
-
-            printState("fin calcul nbr occurences");
-
-            TreeBuilder.buildTree(characterMap);
-
-            printState("fin génération arbre");
-
-            CharEncoder ce = new CharEncoder(s, 10, characterMap);
-
-            BitArray be = ce.encode();
-
-            //System.out.println("Nb bits : " + be.length());
-
-
-            //System.out.println("\n\n");
-
-            printState("fin encodage ");
-
-            try {
-                FileOutputStream out = new FileOutputStream("testfile");
-                out.write(be.toByteArray());
-            }
-            catch(Exception e) {
-                System.out.println("Yolo !");
-            }
-
-            printState("fin save fichier encodé ");
-
-            CharDecoder cd = new CharDecoder(be.toByteArray(), characterMap);
-            String res = cd.decode();
-
-            printState("fin décodage ");
-
-            try {
-                FileOutputStream out = new FileOutputStream("final");
-                out.write(res.getBytes());
-            }
-            catch(Exception e) {
-                System.out.println("Yolo !");
-            }
-
-            printState("fin save fichier décodé ");
-
-            printState("Fin ");
+            encoder.postCountNumberOfCharacters(characterMap);
         }
 
-    }
-
-    private void printState(String status) {
-        System.out.println("Statut : " + status);
-        System.out.println("Exec Time - Advanced : " + (System.currentTimeMillis() - start) + " ms");
-        System.out.println("Used Memory: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024) + " Mo");
-        System.out.println();
-        start = System.currentTimeMillis();
     }
 
     private void printNbCharInDictionnary() {

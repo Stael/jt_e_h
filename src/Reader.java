@@ -5,6 +5,7 @@
  */
 
 import CharUtils.CharCounter.CharCounter;
+import CharUtils.Encoder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 public class Reader {
 
     public void exec() {
-        String s = "files/pg1352.txt";
+        String s = "files/pg1353.txt";
         //this.naive(s);
         this.advanced(s);
     }
@@ -45,24 +46,7 @@ public class Reader {
     }
 
     public void advanced(String s) {
-        long start = System.currentTimeMillis();
-        Path path = Paths.get(s);
-
-        final HashMap<Character, Integer> characterMap = new HashMap<Character, Integer>();
-        try {
-            byte[] byteArray = Files.readAllBytes(path);
-
-            String res = new String(byteArray);
-            //System.out.println("Initials chars : " + res.length());
-
-            CharCounter cc = new CharCounter(res, start);
-            cc.countMulti();
-
-            //System.out.println("Ram used : " + Runtime.getRuntime().totalMemory() / 1000000 + " M");
-
-        } catch (final IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
+        Encoder encoder = new Encoder(s, "testFile.txt");
+        encoder.encode();
     }
 }

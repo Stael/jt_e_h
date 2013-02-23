@@ -33,6 +33,16 @@ public class BitArray {
         return Arrays.copyOfRange(bitArray, 0, lastByte+1);
     }
 
+    public void add(BitArray ba) {
+        for(int i = 0; i <= ba.lastByte; i++) {
+            for(int j = 0; j < 8; j++) {
+                if(! (i == ba.lastByte && j <= ba.lastBit)) {
+                    add(ba.isBitSet(i,j));
+                }
+            }
+        }
+    }
+
     public void add(String bits) {
         for(int i = 0; i < bits.length(); i++) {
             add(bits.charAt(i) == '1');
