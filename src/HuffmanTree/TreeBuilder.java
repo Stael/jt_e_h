@@ -37,12 +37,5 @@ public class TreeBuilder {
         for (Map.Entry<Character, CharFrequency> e : characterMap.entrySet()) {
             pq.add(e.getValue());
         }
-
-        /*
-        while (!pq.isEmpty()) {
-            CharFrequency cf = pq.poll();
-            System.out.println(cf);
-        }
-        */
     }
 }
