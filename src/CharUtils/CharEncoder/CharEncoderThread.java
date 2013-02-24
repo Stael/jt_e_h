@@ -3,6 +3,7 @@ package CharUtils.CharEncoder;
 import BitManagement.BitArray;
 import CharUtils.CharFrequency;
 import ThreadUtils.NotifyingThread;
+import Utils.StatusPrinter;
 
 import java.util.HashMap;
 
@@ -29,14 +30,15 @@ public class CharEncoderThread extends NotifyingThread {
     }
 
     public void encode() {
-        CharFrequency cf;
+        //long start = System.currentTimeMillis();
         for(int i = 0; i < textToEncode.length(); i++) {
-            cf = characterMap.get(textToEncode.charAt(i));
+            CharFrequency cf = characterMap.get(textToEncode.charAt(i));
             if(cf == null) {
                 System.out.println("Yolo FAIL !");
             }
             encodedText.add(cf.getByteCode());
         }
+        //StatusPrinter.printStatus("Fin encoding - thread : " + threadNumber, start);
     }
 
     public BitArray getEncodedText() {

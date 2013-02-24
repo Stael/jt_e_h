@@ -6,6 +6,7 @@ import CharUtils.CharCounter.CharCounterThread;
 import CharUtils.CharFrequency;
 import CharUtils.Encoder;
 import ThreadUtils.ThreadCompleteListener;
+import Utils.StatusPrinter;
 
 import java.util.HashMap;
 
@@ -32,10 +33,9 @@ public class CharEncoder implements ThreadCompleteListener {
     }
 
     public void encodeMono() {
-        CharEncoderThread cet = new CharEncoderThread(textToEncode, characterMap, 0);
-        cet.encode();
-
-        encoder.postEncoding(cet.getEncodedText());
+        nbThread = 1;
+        remainingThreads = 1;
+        encodeMulti();
     }
 
     public void encodeMulti() {
@@ -49,6 +49,8 @@ public class CharEncoder implements ThreadCompleteListener {
             cet.addListener(this);
             cet.start();
         }
+
+        textToEncode = null;
     }
 
     public synchronized void notifyOfThreadComplete(final Thread thread) {
@@ -57,15 +59,18 @@ public class CharEncoder implements ThreadCompleteListener {
         remainingThreads--;
 
         if (remainingThreads == 0) {
-            int length = 0;
-            for(int i = 0; i < nbThread; i++) {
-                length += partialEncodedTexts[i].length();
-            }
-            encodedText = new BitArray(length);
-            for(int i = 0; i < nbThread; i++) {
+            /*
+            start = System.currentTimeMillis();
+
+            encodedText = partialEncodedTexts[0];
+            for(int i = 1; i < nbThread; i++) {
+                //start = System.currentTimeMillis();
                 encodedText.add(partialEncodedTexts[i]);
+                //StatusPrinter.printStatus("Fin concaténation n°" + i, start);
             }
-            encoder.postEncoding(encodedText);
+            */
+
+            encoder.postEncoding(partialEncodedTexts);
         }
     }
 }

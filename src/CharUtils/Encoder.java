@@ -26,6 +26,7 @@ public class Encoder {
     private HashMap<Character, CharFrequency> characterMap;
 
     private long start;
+    private long initialStart;
 
     public Encoder(String pathOfTheFileToEncode, String pathOfTheEncodedFile) {
         this.pathOfTheFileToEncode = pathOfTheFileToEncode;
@@ -33,6 +34,8 @@ public class Encoder {
     }
 
     public void encode() {
+        initialStart = System.currentTimeMillis();
+
         byte[] byteArray = extractTextFromFile();
 
         countNumberOfCharacters(byteArray);
@@ -82,18 +85,28 @@ public class Encoder {
         ce.encodeMulti();
     }
 
-    public void postEncoding(BitArray encodedText) {
+    public void postEncoding(BitArray[] encodedText) {
         StatusPrinter.printStatus("Fin de l'encodage du fichier", start);
 
         start = System.currentTimeMillis();
         try {
             FileOutputStream out = new FileOutputStream(pathOfTheEncodedFile);
-            out.write(encodedText.toByteArray());
+
+            //out.write(encodedText.toByteArray());
+
+            for(int i = 0; i < encodedText.length; i++) {
+                out.write(encodedText[i].byteArrayToWrite());
+                while(encodedText[i].hasNextBitToWrite()) {
+                    out.write(encodedText[i].nextBitToWrite());
+                }
+            }
         }
         catch (Exception e) {
             System.out.println("Yolo !");
         }
 
         StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
+
+        StatusPrinter.printStatus("Fin de l'encodage", initialStart);
     }
 }

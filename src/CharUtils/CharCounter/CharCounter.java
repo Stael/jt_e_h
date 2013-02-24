@@ -4,20 +4,15 @@ package CharUtils.CharCounter; /**
  * Time: 20:29
  */
 
-import BitManagement.BitArray;
-import CharUtils.CharDecoder.CharDecoder;
-import CharUtils.CharEncoder.CharEncoder;
 import CharUtils.CharFrequency;
 import CharUtils.Encoder;
-import HuffmanTree.TreeBuilder;
 import ThreadUtils.ThreadCompleteListener;
 
-import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CharCounter implements ThreadCompleteListener {
-    private String s = "";
+    private String textWhereToCountNumberOfChar;
     private int nbThread = Runtime.getRuntime().availableProcessors();
     private int remainingThreads = Runtime.getRuntime().availableProcessors();
     private long start = 0;
@@ -25,32 +20,29 @@ public class CharCounter implements ThreadCompleteListener {
     private Encoder encoder;
 
 
-    public CharCounter(String s) {
-        this.s = s;
+    public CharCounter(String textWhereToCountNumberOfChar) {
+        this.textWhereToCountNumberOfChar = textWhereToCountNumberOfChar;
     }
 
-    public CharCounter(String s, long start, Encoder encoder) {
-        this.s = s;
+    public CharCounter(String textWhereToCountNumberOfChar, long start, Encoder encoder) {
+        this.textWhereToCountNumberOfChar = textWhereToCountNumberOfChar;
         this.start = start;
         this.encoder = encoder;
     }
 
     public void countMono() {
-        CharCounterThread cct = new CharCounterThread(s);
-        cct.count();
-
-        extractResults(cct);
-
-        encoder.postCountNumberOfCharacters(characterMap);
+        nbThread = 1;
+        remainingThreads = 1;
+        countMulti();
     }
 
     public void countMulti() {
         if (start == 0) start = System.currentTimeMillis();
-        int stringLength = (int) Math.ceil(s.length() / nbThread);
+        int stringLength = (int) Math.ceil(textWhereToCountNumberOfChar.length() / nbThread);
 
         for (int i = 0; i < nbThread; i++) {
             // Problème de la fin du dernier
-            String ns = s.substring(i * stringLength, i + 1 == nbThread ? s.length() : i * stringLength + stringLength);
+            String ns = textWhereToCountNumberOfChar.substring(i * stringLength, i + 1 == nbThread ? textWhereToCountNumberOfChar.length() : i * stringLength + stringLength);
             CharCounterThread cct = new CharCounterThread(ns);
             cct.addListener(this);
             cct.start();
@@ -58,11 +50,11 @@ public class CharCounter implements ThreadCompleteListener {
     }
 
     public synchronized void notifyOfThreadComplete(final Thread thread) {
-        nbThread--;
+        remainingThreads--;
 
         extractResults(((CharCounterThread) thread));
 
-        if (nbThread == 0) {
+        if (remainingThreads == 0) {
             encoder.postCountNumberOfCharacters(characterMap);
         }
 

@@ -42,8 +42,4 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     private int frequency() {
         return cf == null ? left.frequency() + right.frequency() : cf.getNb();
     }
-
-    public CharFrequency getCf() {
-        return cf;
-    }
 }

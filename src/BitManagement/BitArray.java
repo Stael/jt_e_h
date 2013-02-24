@@ -8,9 +8,11 @@ import java.util.Arrays;
  * Time: 12:39
  */
 public class BitArray {
-    byte[]	bitArray;
-    int		lastByte = 0;
-    int		lastBit = 0;
+    private byte[]	bitArray;
+    private int		lastByte = 0;
+    private int		lastBit = 0;
+
+    private int nextBitTowrite = 0;
 
     public BitArray() {
         this(100);
@@ -33,11 +35,39 @@ public class BitArray {
         return Arrays.copyOfRange(bitArray, 0, lastByte+1);
     }
 
+    public byte[] byteArrayToWrite() {
+        return Arrays.copyOfRange(bitArray, 0, lastByte);
+    }
+
+    public boolean hasNextBitToWrite() {
+        return nextBitTowrite < lastBit;
+    }
+
+    public int nextBitToWrite() {
+        if(hasNextBitToWrite()) {
+            int nextBit =  isBitSet(lastByte, nextBitTowrite) ? 1 : 0;
+            nextBitTowrite++;
+            return nextBit;
+        }
+        else {
+            System.out.println("ERROR !!");
+            return 0;
+        }
+    }
+
     public void add(BitArray ba) {
-        for(int i = 0; i <= ba.lastByte; i++) {
-            for(int j = 0; j < 8; j++) {
-                if(! (i == ba.lastByte && j <= ba.lastBit)) {
-                    add(ba.isBitSet(i,j));
+        if(lastBit == 0) {
+            for(int i = 0; i <= ba.lastByte; i++) {
+                bitArray[lastByte] = ba.bitArray[ba.lastByte];
+            }
+            lastBit = ba.lastBit;
+        }
+        else {
+            for(int i = 0; i <= ba.lastByte; i++) {
+                for(int j = 0; j < 8; j++) {
+                    if(! (i == ba.lastByte && j <= ba.lastBit)) {
+                        add(ba.isBitSet(i,j));
+                    }
                 }
             }
         }
