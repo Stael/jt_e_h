@@ -4,13 +4,10 @@ import BitManagement.BitArray;
 import CharUtils.CharCounter.CharCounter;
 import CharUtils.CharEncoder.CharEncoder;
 import HuffmanTree.TreeBuilder;
+import IO.FileReader;
 import Utils.StatusPrinter;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 /**
@@ -35,34 +32,20 @@ public class Encoder {
 
     public void encode() {
         initialStart = System.currentTimeMillis();
-
-        byte[] byteArray = extractTextFromFile();
-
-        countNumberOfCharacters(byteArray);
-    }
-
-    public byte[] extractTextFromFile() {
         start = System.currentTimeMillis();
 
-        Path path = Paths.get(pathOfTheFileToEncode);
-        byte[] byteArray = null;
-        try {
-            byteArray = Files.readAllBytes(path);
-
-        } catch (final IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
+        byte[] byteArray = FileReader.extractTextFromFile(pathOfTheFileToEncode);
 
         StatusPrinter.printStatus("Fin de la lecture du fichier à encoder", start);
-        return byteArray;
+
+        countNumberOfCharacters(byteArray);
     }
 
     public void countNumberOfCharacters(byte[] byteArray) {
         start = System.currentTimeMillis();
         textToEncode = new String(byteArray);
 
-        CharCounter cc = new CharCounter(textToEncode, System.currentTimeMillis(), this);
+        CharCounter cc = new CharCounter(textToEncode, this);
         cc.countMulti();
     }
 
@@ -83,6 +66,7 @@ public class Encoder {
         start = System.currentTimeMillis();
         CharEncoder ce = new CharEncoder(textToEncode, 10, characterMap, this);
         ce.encodeMulti();
+        textToEncode = null;
     }
 
     public void postEncoding(BitArray[] encodedText) {
@@ -108,5 +92,9 @@ public class Encoder {
         StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
 
         StatusPrinter.printStatus("Fin de l'encodage", initialStart);
+
+        Decoder d = new Decoder(pathOfTheEncodedFile, "final.txt");
+        d.setCharacterMap(characterMap);
+        d.decode();
     }
 }

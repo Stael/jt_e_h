@@ -20,8 +20,6 @@ public class CharEncoder implements ThreadCompleteListener {
     private int remainingThreads = Runtime.getRuntime().availableProcessors();
     private String textToEncode;
     private HashMap<Character, CharFrequency> characterMap;
-    private long start = 0;
-    private BitArray encodedText;
     private BitArray[] partialEncodedTexts = new BitArray[nbThread];
     private Encoder encoder;
 
@@ -39,8 +37,6 @@ public class CharEncoder implements ThreadCompleteListener {
     }
 
     public void encodeMulti() {
-        if (start == 0) start = System.currentTimeMillis();
-
         int stringLength = (int) Math.ceil(textToEncode.length() / nbThread);
 
         for (int i = 0; i < nbThread; i++) {
@@ -59,17 +55,6 @@ public class CharEncoder implements ThreadCompleteListener {
         remainingThreads--;
 
         if (remainingThreads == 0) {
-            /*
-            start = System.currentTimeMillis();
-
-            encodedText = partialEncodedTexts[0];
-            for(int i = 1; i < nbThread; i++) {
-                //start = System.currentTimeMillis();
-                encodedText.add(partialEncodedTexts[i]);
-                //StatusPrinter.printStatus("Fin concaténation n°" + i, start);
-            }
-            */
-
             encoder.postEncoding(partialEncodedTexts);
         }
     }

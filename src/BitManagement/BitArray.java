@@ -8,9 +8,9 @@ import java.util.Arrays;
  * Time: 12:39
  */
 public class BitArray {
-    private byte[]	bitArray;
-    private int		lastByte = 0;
-    private int		lastBit = 0;
+    protected byte[]	bitArray;
+    protected int		lastByte = 0;
+    protected int		lastBit = 0;
 
     private int nextBitTowrite = 0;
 

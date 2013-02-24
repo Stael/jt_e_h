@@ -15,18 +15,11 @@ public class CharCounter implements ThreadCompleteListener {
     private String textWhereToCountNumberOfChar;
     private int nbThread = Runtime.getRuntime().availableProcessors();
     private int remainingThreads = Runtime.getRuntime().availableProcessors();
-    private long start = 0;
     private HashMap<Character, CharFrequency> characterMap = new HashMap<Character, CharFrequency>();
     private Encoder encoder;
 
-
-    public CharCounter(String textWhereToCountNumberOfChar) {
+    public CharCounter(String textWhereToCountNumberOfChar, Encoder encoder) {
         this.textWhereToCountNumberOfChar = textWhereToCountNumberOfChar;
-    }
-
-    public CharCounter(String textWhereToCountNumberOfChar, long start, Encoder encoder) {
-        this.textWhereToCountNumberOfChar = textWhereToCountNumberOfChar;
-        this.start = start;
         this.encoder = encoder;
     }
 
@@ -37,7 +30,6 @@ public class CharCounter implements ThreadCompleteListener {
     }
 
     public void countMulti() {
-        if (start == 0) start = System.currentTimeMillis();
         int stringLength = (int) Math.ceil(textWhereToCountNumberOfChar.length() / nbThread);
 
         for (int i = 0; i < nbThread; i++) {

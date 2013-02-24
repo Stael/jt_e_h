@@ -18,7 +18,7 @@ import java.util.HashMap;
 public class Reader {
 
     public void exec() {
-        String s = "files/pg1355.txt";
+        String s = "files/pg1351.txt";
         //this.naive(s);
         this.advanced(s);
     }
