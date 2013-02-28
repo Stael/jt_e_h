@@ -8,7 +8,7 @@ package CharUtils;
 public class CharFrequency implements Comparable<CharFrequency> {
     private int nb = 1;
     private char character;
-    private String byteCode;
+    private String byteCode = new String();
 
     public CharFrequency(char c) {
         this.character = c;
@@ -46,11 +46,11 @@ public class CharFrequency implements Comparable<CharFrequency> {
     @Override
     public String toString() {
         if (character == '\n') {
-            return "Character : '\\n' - \t\t\t Frequence : " + nb + " - \t\t\t Code : " + new String(byteCode);
+            return "Character : '\\n' - \t\t\t Frequence : " + nb + " - \t\t\t Code : " + byteCode;
         } else if (character == '\t') {
-            return "Character : '\\t' - \t\t\t Frequence : " + nb + " - \t\t\t Code : " + new String(byteCode);
+            return "Character : '\\t' - \t\t\t Frequence : " + nb + " - \t\t\t Code : " + byteCode;
         } else {
-            return "Character : '" + character + "' - \t\t\t Frequence : " + nb + " - \t\t\t Code : " + new String(byteCode);
+            return "Character : '" + character + "' - \t\t\t Frequence : " + nb + " - \t\t\t Code : " + byteCode;
         }
     }
 }

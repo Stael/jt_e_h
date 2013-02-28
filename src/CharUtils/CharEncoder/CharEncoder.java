@@ -20,7 +20,7 @@ public class CharEncoder implements ThreadCompleteListener {
     private int remainingThreads = Runtime.getRuntime().availableProcessors();
     private String textToEncode;
     private HashMap<Character, CharFrequency> characterMap;
-    private BitArray[] partialEncodedTexts = new BitArray[nbThread];
+    private BitArray[] partialEncodedTexts;
     private Encoder encoder;
 
 
@@ -33,10 +33,12 @@ public class CharEncoder implements ThreadCompleteListener {
     public void encodeMono() {
         nbThread = 1;
         remainingThreads = 1;
+        partialEncodedTexts = new BitArray[1];
         encodeMulti();
     }
 
     public void encodeMulti() {
+        partialEncodedTexts = new BitArray[nbThread];
         int stringLength = (int) Math.ceil(textToEncode.length() / nbThread);
 
         for (int i = 0; i < nbThread; i++) {

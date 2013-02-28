@@ -1,46 +1,53 @@
 package CharUtils.CharDecoder;
 
+import BitManagement.BitArray;
 import BitManagement.BitExtractor;
-import CharUtils.CharFrequency;
-
-import java.util.HashMap;
-import java.util.Map;
+import CharUtils.CharEncoder.CharEncoderThread;
+import CharUtils.Decoder;
+import HuffmanTree.HuffmanTree;
+import HuffmanTree.HuffmanNode;
+import ThreadUtils.ThreadCompleteListener;
 
 /**
  * User: thibaultramires
  * Date: 23/02/13
  * Time: 13:42
  */
-public class CharDecoder {
-    private BitExtractor bitArray;
-    private HashMap<Character, CharFrequency> characterMap;
-    private HashMap<String, CharFrequency> stringMap;
+public class CharDecoder implements ThreadCompleteListener {
+    private BitExtractor[] arrayOfBitExtractor;
+    private HuffmanTree tree;
+    private String[] decodedText;
 
-    public CharDecoder(byte[] byteArray, HashMap<Character, CharFrequency> characterMap) {
-        stringMap = new HashMap<String, CharFrequency>();
-        this.bitArray = new BitExtractor(byteArray);
-        this.characterMap = characterMap;
-        convertCharacterMap();
+    private int nbThread = Runtime.getRuntime().availableProcessors();
+    private int remainingThreads = Runtime.getRuntime().availableProcessors();
+    private Decoder decoder;
+
+    public CharDecoder(BitExtractor[] arrayOfBitExtractor, HuffmanTree tree, Decoder decoder) {
+        this.arrayOfBitExtractor = arrayOfBitExtractor;
+        this.tree = tree;
+        remainingThreads = arrayOfBitExtractor.length;
+        nbThread = arrayOfBitExtractor.length;
+        decodedText = new String[nbThread];
+        this.decoder = decoder;
     }
 
-    private void convertCharacterMap() {
-        for (Map.Entry<Character, CharFrequency> e : characterMap.entrySet()) {
-            stringMap.put(e.getValue().getByteCode(), e.getValue());
-        }
-    }
-
-    public String decode() {
-        StringBuffer res = new StringBuffer();
-        while(bitArray.hasNext()) {
-            String binaryWord = bitArray.next();
-            CharFrequency cf = stringMap.get(binaryWord);
-            if(cf != null) {
-                bitArray.newString();
-                res.append(cf.getCharacter());
-            }
+    public void decodeMulti() {
+        for (int i = 0; i < nbThread; i++) {
+            CharDecoderThread cdt = new CharDecoderThread(arrayOfBitExtractor[i], tree, i);
+            cdt.addListener(this);
+            cdt.start();
         }
 
-        return res.toString();
+        arrayOfBitExtractor = null;
     }
 
+    public synchronized void notifyOfThreadComplete(final Thread thread) {
+        decodedText[((CharDecoderThread) thread).getThreadNumber()] = ((CharDecoderThread) thread).getDecodedText();
+
+        remainingThreads--;
+
+        if(remainingThreads == 0) {
+            decoder.postDecode(decodedText);
+        }
+    }
 }

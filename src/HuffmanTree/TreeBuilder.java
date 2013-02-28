@@ -5,7 +5,6 @@ import CharUtils.CharFrequency;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.TreeSet;
 
 /**
  * User: thibaultramires
@@ -14,28 +13,37 @@ import java.util.TreeSet;
  */
 public class TreeBuilder {
 
-    public static void buildTree(HashMap<Character, CharFrequency> characterMap) {
+    public static String buildTree(HashMap<Character, CharFrequency> characterMap) {
 
-        PriorityQueue<HuffmanTree> prioQueue = new PriorityQueue<HuffmanTree>();
+        PriorityQueue<HuffmanNode> prioQueue = new PriorityQueue<HuffmanNode>();
         for (Map.Entry<Character, CharFrequency> e : characterMap.entrySet()) {
-            prioQueue.add(new HuffmanTree(e.getValue()));
+            prioQueue.add(new HuffmanNode(e.getValue()));
         }
 
         while (prioQueue.size() > 1) {
-            HuffmanTree left = prioQueue.poll();
-            HuffmanTree right = prioQueue.poll();
+            HuffmanNode left = prioQueue.poll();
+            HuffmanNode right = prioQueue.poll();
 
-            HuffmanTree nt = new HuffmanTree(left, right);
+            HuffmanNode nt = new HuffmanNode(left, right);
 
             prioQueue.add(nt);
         }
 
-        HuffmanTree finalTree = prioQueue.poll();
-        finalTree.generateCode();
+        HuffmanNode root = prioQueue.poll();
+        HuffmanTree tree = new HuffmanTree(root);
+        tree.generateCode();
 
-        PriorityQueue<CharFrequency> pq = new PriorityQueue<CharFrequency>();
-        for (Map.Entry<Character, CharFrequency> e : characterMap.entrySet()) {
-            pq.add(e.getValue());
-        }
+        return tree.charAndLength();
+    }
+
+    public static HashMap<Character, CharFrequency> regenerateTree(String serializedTree) {
+        HuffmanTree tree = new HuffmanTree();
+        return tree.regeneration(serializedTree);
+    }
+
+    public static HuffmanTree regenerateTreeT(String serializedTree) {
+        HuffmanTree tree = new HuffmanTree();
+        tree.regeneration(serializedTree);
+        return tree;
     }
 }

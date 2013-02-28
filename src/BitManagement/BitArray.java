@@ -12,8 +12,6 @@ public class BitArray {
     protected int		lastByte = 0;
     protected int		lastBit = 0;
 
-    private int nextBitTowrite = 0;
-
     public BitArray() {
         this(100);
     }
@@ -33,26 +31,6 @@ public class BitArray {
 
     public byte[] toByteArray() {
         return Arrays.copyOfRange(bitArray, 0, lastByte+1);
-    }
-
-    public byte[] byteArrayToWrite() {
-        return Arrays.copyOfRange(bitArray, 0, lastByte);
-    }
-
-    public boolean hasNextBitToWrite() {
-        return nextBitTowrite < lastBit;
-    }
-
-    public int nextBitToWrite() {
-        if(hasNextBitToWrite()) {
-            int nextBit =  isBitSet(lastByte, nextBitTowrite) ? 1 : 0;
-            nextBitTowrite++;
-            return nextBit;
-        }
-        else {
-            System.out.println("ERROR !!");
-            return 0;
-        }
     }
 
     public void add(BitArray ba) {
@@ -111,12 +89,6 @@ public class BitArray {
         return lastByte * 8 + lastBit ;
     }
 
-    private void finalise() {
-        while(lastBit != 7) {
-            add(false);
-        }
-    }
-
     public BitArray clone() {
         return new BitArray(bitArray, lastByte, lastBit);
     }
@@ -131,5 +103,13 @@ public class BitArray {
             res.append('.');
         }
         return res.toString();
+    }
+
+    public int getLastByte() {
+        return lastByte;
+    }
+
+    public int getLastBit() {
+        return lastBit;
     }
 }

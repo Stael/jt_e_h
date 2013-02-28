@@ -2,44 +2,61 @@ package HuffmanTree;
 
 import CharUtils.CharFrequency;
 
+import java.util.HashMap;
+
 /**
  * User: thibaultramires
- * Date: 21/02/13
- * Time: 20:01
+ * Date: 27/02/13
+ * Time: 18:02
  */
-public class HuffmanTree implements Comparable<HuffmanTree> {
-    private CharFrequency cf;
-    private HuffmanTree left;
-    private HuffmanTree right;
+public class HuffmanTree {
+    private HuffmanNode root;
+    private HashMap<Character, CharFrequency> characterMap = new HashMap<Character, CharFrequency>();
 
-    public HuffmanTree(CharFrequency cf) {
-        this.cf = cf;
+    public HuffmanTree(HuffmanNode root) {
+        this.root = root;
     }
 
-    public HuffmanTree(HuffmanTree left, HuffmanTree right) {
-        this.left = left;
-        this.right = right;
+    public HuffmanTree() {
     }
 
     public void generateCode() {
-        generateCode("");
+        root.generateCode("");
     }
 
-    private void generateCode(String s) {
-        if (cf == null) {
-            left.generateCode(s + "0");
-            right.generateCode(s + "1");
-        } else {
-            cf.setByteCode(s);
+    public String charAndLength() {
+        return root.charAndLength() + "..";
+    }
+
+    public HashMap<Character, CharFrequency> regeneration(String serializedTree) {
+        root = new HuffmanNode();
+
+        int i = 0;
+        while(i < serializedTree.length()) {
+
+            char c = serializedTree.charAt(i);
+            i++;
+
+            StringBuffer length = new StringBuffer();
+            while(i < serializedTree.length() && serializedTree.charAt(i) != '.') {
+                length.append(serializedTree.charAt(i));
+                i++;
+            }
+            i++;
+            int charLength = Integer.parseInt(length.toString());
+
+            CharFrequency cf = new CharFrequency(c);
+
+            characterMap.put(c, cf);
+            root.regenerate(cf, charLength, 0);
         }
+
+        generateCode();
+
+        return characterMap;
     }
 
-    @Override
-    public int compareTo(HuffmanTree ht) {
-        return this.frequency() - ht.frequency();
-    }
-
-    private int frequency() {
-        return cf == null ? left.frequency() + right.frequency() : cf.getNb();
+    public HuffmanNode getRoot() {
+        return root;
     }
 }

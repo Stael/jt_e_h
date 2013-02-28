@@ -18,6 +18,7 @@ import java.util.HashMap;
 public class Encoder {
     private String pathOfTheFileToEncode;
     private String pathOfTheEncodedFile;
+    private String serializedTree;
 
     private String textToEncode;
     private HashMap<Character, CharFrequency> characterMap;
@@ -44,6 +45,7 @@ public class Encoder {
     public void countNumberOfCharacters(byte[] byteArray) {
         start = System.currentTimeMillis();
         textToEncode = new String(byteArray);
+        System.out.println("Initial length : " + textToEncode.length());
 
         CharCounter cc = new CharCounter(textToEncode, this);
         cc.countMulti();
@@ -55,7 +57,7 @@ public class Encoder {
 
         start = System.currentTimeMillis();
 
-        TreeBuilder.buildTree(characterMap);
+        serializedTree = TreeBuilder.buildTree(characterMap);
 
         StatusPrinter.printStatus("Fin de la création de l'arbre", start);
 
@@ -66,6 +68,7 @@ public class Encoder {
         start = System.currentTimeMillis();
         CharEncoder ce = new CharEncoder(textToEncode, 10, characterMap, this);
         ce.encodeMulti();
+
         textToEncode = null;
     }
 
@@ -76,17 +79,29 @@ public class Encoder {
         try {
             FileOutputStream out = new FileOutputStream(pathOfTheEncodedFile);
 
-            //out.write(encodedText.toByteArray());
+            StringBuffer textPartHeader = new StringBuffer();
+            for(int i = 0; i < encodedText.length; i++) {
+                textPartHeader.append('>');
+                textPartHeader.append(encodedText[i].getLastByte());
+                textPartHeader.append(':');
+                textPartHeader.append(encodedText[i].getLastBit());
+                textPartHeader.append('.');
+            }
+            textPartHeader.append("--");
+
+            out.write(textPartHeader.toString().getBytes());
+
+            out.write(serializedTree.getBytes());
 
             for(int i = 0; i < encodedText.length; i++) {
-                out.write(encodedText[i].byteArrayToWrite());
-                while(encodedText[i].hasNextBitToWrite()) {
-                    out.write(encodedText[i].nextBitToWrite());
-                }
+                out.write(encodedText[i].toByteArray());
             }
+
+            out.close();
         }
         catch (Exception e) {
-            System.out.println("Yolo !");
+            e.printStackTrace();
+            System.exit(-1);
         }
 
         StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
@@ -94,7 +109,6 @@ public class Encoder {
         StatusPrinter.printStatus("Fin de l'encodage", initialStart);
 
         Decoder d = new Decoder(pathOfTheEncodedFile, "final.txt");
-        d.setCharacterMap(characterMap);
         d.decode();
     }
 }

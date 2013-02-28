@@ -30,7 +30,6 @@ public class CharEncoderThread extends NotifyingThread {
     }
 
     public void encode() {
-        //long start = System.currentTimeMillis();
         for(int i = 0; i < textToEncode.length(); i++) {
             CharFrequency cf = characterMap.get(textToEncode.charAt(i));
             if(cf == null) {
@@ -38,7 +37,6 @@ public class CharEncoderThread extends NotifyingThread {
             }
             encodedText.add(cf.getByteCode());
         }
-        //StatusPrinter.printStatus("Fin encoding - thread : " + threadNumber, start);
     }
 
     public BitArray getEncodedText() {
