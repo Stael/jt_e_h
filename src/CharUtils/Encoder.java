@@ -7,6 +7,7 @@ import HuffmanTree.TreeBuilder;
 import IO.FileReader;
 import Utils.StatusPrinter;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 
@@ -76,6 +77,12 @@ public class Encoder {
 
         start = System.currentTimeMillis();
         try {
+            File f = new File(pathOfTheEncodedFile);
+            while(!f.getParentFile().exists()) {
+                f.getParentFile().mkdirs();
+                f = f.getParentFile();
+            }
+
             FileOutputStream out = new FileOutputStream(pathOfTheEncodedFile);
 
             StringBuffer textPartHeader = new StringBuffer();
@@ -106,8 +113,5 @@ public class Encoder {
         StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
 
         StatusPrinter.printStatus("Fin de l'encodage", initialStart);
-
-        Decoder d = new Decoder(pathOfTheEncodedFile, "final.txt");
-        d.decode();
     }
 }

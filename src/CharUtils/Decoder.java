@@ -8,6 +8,7 @@ import HuffmanTree.TreeBuilder;
 import IO.FileReader;
 import Utils.StatusPrinter;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -106,7 +107,14 @@ public class Decoder {
         StatusPrinter.printStatus("Fin du décodage du fichier", start);
         start = System.currentTimeMillis();
 
+
         try {
+            File f = new File(pathOfTheDecodedFile);
+            while(!f.getParentFile().exists()) {
+                f.getParentFile().mkdirs();
+                f = f.getParentFile();
+            }
+
             FileOutputStream out = new FileOutputStream(pathOfTheDecodedFile);
             for(int i = 0; i < decodedText.length; i++) {
                 out.write(decodedText[i].getBytes());
