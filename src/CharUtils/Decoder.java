@@ -23,7 +23,6 @@ public class Decoder {
     private String pathOfTheFileToDecode;
     private String pathOfTheDecodedFile;
 
-    private HashMap<Character, CharFrequency> characterMap;
     private HuffmanTree tree;
     private BitExtractor[] ArrayOfBitExtractor;
 
@@ -59,12 +58,7 @@ public class Decoder {
             i++;
         }
 
-        String headerlol = header.substring(0, header.indexOf("...")+3);
         int headerLength = header.substring(0, header.indexOf("...")+3).getBytes().length;
-
-        byte[] code = Arrays.copyOfRange(byteArray, headerLength, byteArray.length);
-        String file = new String(byteArray);
-        String filenoheader = new String(code);
 
         // On récupère la taille des parties du fichier
         String patternString1 = ">([0-9]*):([0-9]*)\\.";
@@ -95,7 +89,6 @@ public class Decoder {
 
         // On regenére l'arbe de Huffamn
         String treeHeader = header.substring(header.indexOf("--")+2, header.indexOf("...")+1);
-        characterMap = TreeBuilder.regenerateTree(treeHeader);
         tree = TreeBuilder.regenerateTreeT(treeHeader);
 
         StatusPrinter.printStatus("Fin du décodage du header", start);

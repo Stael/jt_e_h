@@ -45,7 +45,6 @@ public class Encoder {
     public void countNumberOfCharacters(byte[] byteArray) {
         start = System.currentTimeMillis();
         textToEncode = new String(byteArray);
-        System.out.println("Initial length : " + textToEncode.length());
 
         CharCounter cc = new CharCounter(textToEncode, this);
         cc.countMulti();
