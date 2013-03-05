@@ -41,10 +41,20 @@ public class Encoder {
         StatusPrinter.printStatus("Fin de la lecture du fichier à encoder", start);
         start = System.currentTimeMillis();
 
+        System.gc();
+
+        StatusPrinter.printStatus("Fin GC", start);
+        start = System.currentTimeMillis();
+
         textToEncode = explodeByteArray(byteArray);
         byteArray = null;
 
         StatusPrinter.printStatus("Fin de la découpe du fichier", start);
+        start = System.currentTimeMillis();
+
+        System.gc();
+
+        StatusPrinter.printStatus("Fin GC", start);
         start = System.currentTimeMillis();
 
         CharFrequency[] charFrequency = countNumberOfCharacters(textToEncode);
@@ -63,6 +73,11 @@ public class Encoder {
         StatusPrinter.printStatus("Fin de l'encodage du fichier", start);
         start = System.currentTimeMillis();
 
+        System.gc();
+
+        StatusPrinter.printStatus("Fin GC", start);
+        start = System.currentTimeMillis();
+
         saveCompressedFile(encodedText);
 
         StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
@@ -77,10 +92,10 @@ public class Encoder {
 
         int startIndice = 0;
         for(int i = 0; i < nbThread; i++) {
-            int stopIndice = startIndice + (int) Math.ceil(byteArrayLength/nbThread);
+            int stopIndice = startIndice + (int) Math.ceil(byteArrayLength/nbThread) + 1;
             stopIndice = stopIndice > byteArrayLength ? byteArrayLength : stopIndice;
             textToEncode.add(Arrays.copyOfRange(byteArray, startIndice, stopIndice));
-            startIndice = stopIndice + 1;
+            startIndice = stopIndice;
         }
         return textToEncode;
     }
