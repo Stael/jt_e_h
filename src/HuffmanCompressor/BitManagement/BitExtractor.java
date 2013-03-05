@@ -1,4 +1,4 @@
-package BitManagement;
+package HuffmanCompressor.BitManagement;
 
 /**
  * User: thibaultramires

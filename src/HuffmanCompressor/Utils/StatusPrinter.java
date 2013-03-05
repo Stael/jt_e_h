@@ -1,4 +1,4 @@
-package Utils;
+package HuffmanCompressor.Utils;
 
 /**
  * User: thibaultramires

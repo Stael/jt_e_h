@@ -1,15 +1,17 @@
-package CharUtils;
+package HuffmanCompressor.CharUtils;
 
-import BitManagement.BitArray;
-import CharUtils.CharCounter.CharCounter;
-import CharUtils.CharEncoder.CharEncoder;
-import HuffmanTree.TreeBuilder;
-import IO.FileReader;
-import Utils.StatusPrinter;
+import HuffmanCompressor.BitManagement.BitArray;
+import HuffmanCompressor.CharUtils.CharCounter.CharCounter;
+import HuffmanCompressor.CharUtils.CharEncoder.CharEncoder;
+import HuffmanCompressor.HuffmanTree.HuffmanTree;
+import HuffmanCompressor.IO.FileReader;
+import HuffmanCompressor.Utils.StatusPrinter;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * User: thibaultramires
@@ -20,9 +22,7 @@ public class Encoder {
     private String pathOfTheFileToEncode;
     private String pathOfTheEncodedFile;
     private String serializedTree;
-
-    private String textToEncode;
-    private HashMap<Character, CharFrequency> characterMap;
+    private List<byte[]> textToEncode;
 
     private long start;
     private long initialStart;
@@ -39,43 +39,68 @@ public class Encoder {
         byte[] byteArray = FileReader.extractTextFromFile(pathOfTheFileToEncode);
 
         StatusPrinter.printStatus("Fin de la lecture du fichier à encoder", start);
-
-        countNumberOfCharacters(byteArray);
-    }
-
-    public void countNumberOfCharacters(byte[] byteArray) {
         start = System.currentTimeMillis();
-        textToEncode = new String(byteArray);
 
-        CharCounter cc = new CharCounter(textToEncode, this);
-        cc.countMulti();
-    }
+        textToEncode = explodeByteArray(byteArray);
+        byteArray = null;
 
-    public void postCountNumberOfCharacters(HashMap<Character, CharFrequency> characterMap) {
+        StatusPrinter.printStatus("Fin de la découpe du fichier", start);
+        start = System.currentTimeMillis();
+
+        CharFrequency[] charFrequency = countNumberOfCharacters(textToEncode);
+
         StatusPrinter.printStatus("Fin du comptage du nombre d'occurences", start);
-        this.characterMap = characterMap;
-
         start = System.currentTimeMillis();
 
-        serializedTree = TreeBuilder.buildTree(characterMap);
+        HuffmanTree huffmanTree = new HuffmanTree(charFrequency);
+        serializedTree = huffmanTree.charAndLength();
 
         StatusPrinter.printStatus("Fin de la création de l'arbre", start);
-
-        encodeText();
-    }
-
-    public void encodeText() {
         start = System.currentTimeMillis();
-        CharEncoder ce = new CharEncoder(textToEncode, 10, characterMap, this);
-        ce.encodeMulti();
 
-        textToEncode = null;
-    }
+        BitArray[] encodedText = encodeText(charFrequency);
 
-    public void postEncoding(BitArray[] encodedText) {
         StatusPrinter.printStatus("Fin de l'encodage du fichier", start);
-
         start = System.currentTimeMillis();
+
+        saveCompressedFile(encodedText);
+
+        StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
+        StatusPrinter.printStatus("Fin de l'encodage", initialStart);
+    }
+
+    private List<byte[]> explodeByteArray(byte[] byteArray) {
+        int byteArrayLength = byteArray.length;
+
+        int nbThread = 8;
+        List<byte[]> textToEncode = new ArrayList<byte[]>();
+
+        int startIndice = 0;
+        for(int i = 0; i < nbThread; i++) {
+            int stopIndice = startIndice + (int) Math.ceil(byteArrayLength/nbThread);
+            stopIndice = stopIndice > byteArrayLength ? byteArrayLength : stopIndice;
+            textToEncode.add(Arrays.copyOfRange(byteArray, startIndice, stopIndice));
+            startIndice = stopIndice + 1;
+        }
+        return textToEncode;
+    }
+
+    public CharFrequency[] countNumberOfCharacters(List<byte[]> textToEncode) {
+        start = System.currentTimeMillis();
+
+        CharCounter cc = new CharCounter(textToEncode);
+        return cc.countMono();
+
+    }
+
+    public BitArray[] encodeText(CharFrequency[] charFrequency) {
+        CharEncoder ce = new CharEncoder(textToEncode, charFrequency);
+        textToEncode = null;
+
+        return ce.encodeMulti();
+    }
+
+    public void saveCompressedFile(BitArray[] encodedText) {
         try {
             File f = new File(pathOfTheEncodedFile);
             while(!f.getParentFile().exists()) {
@@ -109,9 +134,5 @@ public class Encoder {
             e.printStackTrace();
             System.exit(-1);
         }
-
-        StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
-
-        StatusPrinter.printStatus("Fin de l'encodage", initialStart);
     }
 }

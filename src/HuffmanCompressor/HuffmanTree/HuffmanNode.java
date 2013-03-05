@@ -1,6 +1,6 @@
-package HuffmanTree;
+package HuffmanCompressor.HuffmanTree;
 
-import CharUtils.CharFrequency;
+import HuffmanCompressor.CharUtils.CharFrequency;
 
 /**
  * User: thibaultramires
@@ -116,7 +116,7 @@ public class HuffmanNode implements Comparable<HuffmanNode> {
     }
 
     private int frequency() {
-        return cf == null ? left.frequency() + right.frequency() : cf.getNb();
+        return cf == null ? left.frequency() + right.frequency() : cf.getNbOccurence();
     }
 
     public HuffmanNode getLeft() {

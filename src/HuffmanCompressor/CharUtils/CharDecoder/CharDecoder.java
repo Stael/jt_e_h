@@ -1,12 +1,9 @@
-package CharUtils.CharDecoder;
+package HuffmanCompressor.CharUtils.CharDecoder;
 
-import BitManagement.BitArray;
-import BitManagement.BitExtractor;
-import CharUtils.CharEncoder.CharEncoderThread;
-import CharUtils.Decoder;
-import HuffmanTree.HuffmanTree;
-import HuffmanTree.HuffmanNode;
-import ThreadUtils.ThreadCompleteListener;
+import HuffmanCompressor.BitManagement.BitExtractor;
+import HuffmanCompressor.CharUtils.Decoder;
+import HuffmanCompressor.HuffmanTree.HuffmanTree;
+import HuffmanCompressor.ThreadUtils.ThreadCompleteListener;
 
 /**
  * User: thibaultramires
@@ -38,10 +35,11 @@ public class CharDecoder implements ThreadCompleteListener {
             cdt.start();
         }
 
+
         arrayOfBitExtractor = null;
     }
 
-    public synchronized void notifyOfThreadComplete(final Thread thread) {
+    public void notifyOfThreadComplete(final Thread thread) {
         decodedText[((CharDecoderThread) thread).getThreadNumber()] = ((CharDecoderThread) thread).getDecodedText();
 
         remainingThreads--;

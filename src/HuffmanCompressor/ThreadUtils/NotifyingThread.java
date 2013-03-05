@@ -1,4 +1,4 @@
-package ThreadUtils; /**
+package HuffmanCompressor.ThreadUtils; /**
  * User: thibaultramires
  * Date: 17/02/13
  * Time: 18:18
@@ -18,7 +18,7 @@ public abstract class NotifyingThread extends Thread {
         listeners.remove(listener);
     }
 
-    private final synchronized void notifyListeners() {
+    private final void notifyListeners() {
         for (ThreadCompleteListener listener : listeners) {
             listener.notifyOfThreadComplete(this);
         }

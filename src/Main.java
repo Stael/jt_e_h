@@ -1,5 +1,5 @@
-import CharUtils.Decoder;
-import CharUtils.Encoder;
+import HuffmanCompressor.CharUtils.Decoder;
+import HuffmanCompressor.CharUtils.Encoder;
 
 public class Main {
 

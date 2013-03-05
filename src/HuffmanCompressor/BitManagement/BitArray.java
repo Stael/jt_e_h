@@ -1,4 +1,4 @@
-package BitManagement;
+package HuffmanCompressor.BitManagement;
 
 import java.util.Arrays;
 

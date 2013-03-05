@@ -1,9 +1,10 @@
-package CharUtils.CharDecoder;
+package HuffmanCompressor.CharUtils.CharDecoder;
 
-import BitManagement.BitExtractor;
-import HuffmanTree.HuffmanTree;
-import HuffmanTree.HuffmanNode;
-import ThreadUtils.NotifyingThread;
+import HuffmanCompressor.BitManagement.BitExtractor;
+import HuffmanCompressor.HuffmanTree.HuffmanTree;
+import HuffmanCompressor.HuffmanTree.HuffmanNode;
+import HuffmanCompressor.ThreadUtils.NotifyingThread;
+import HuffmanCompressor.Utils.StatusPrinter;
 
 /**
  * User: thibaultramires
@@ -27,6 +28,8 @@ public class CharDecoderThread extends NotifyingThread {
     }
 
     public void decode() {
+        long start = System.currentTimeMillis();
+
         StringBuffer res = new StringBuffer();
         HuffmanNode parc = tree.getRoot();
         while(bitExtractor.hasNext()) {
@@ -44,6 +47,8 @@ public class CharDecoderThread extends NotifyingThread {
             }
         }
         decodedText = res.toString();
+
+        StatusPrinter.printStatus("Fin thread : " + threadNumber, start);
     }
 
     public int getThreadNumber() {

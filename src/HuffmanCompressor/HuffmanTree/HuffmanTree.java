@@ -1,8 +1,10 @@
-package HuffmanTree;
+package HuffmanCompressor.HuffmanTree;
 
-import CharUtils.CharFrequency;
+import HuffmanCompressor.CharUtils.CharFrequency;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 /**
  * User: thibaultramires
@@ -54,6 +56,25 @@ public class HuffmanTree {
         generateCode();
 
         return characterMap;
+    }
+
+    public HuffmanTree(CharFrequency[] charFrequency) {
+        PriorityQueue<HuffmanNode> prioQueue = new PriorityQueue<HuffmanNode>();
+        for (int i = 0; i < 256; i ++) {
+            prioQueue.add(new HuffmanNode(charFrequency[i]));
+        }
+
+        while (prioQueue.size() > 1) {
+            HuffmanNode left = prioQueue.poll();
+            HuffmanNode right = prioQueue.poll();
+
+            HuffmanNode nt = new HuffmanNode(left, right);
+
+            prioQueue.add(nt);
+        }
+
+        root = prioQueue.poll();
+        generateCode();
     }
 
     public HuffmanNode getRoot() {

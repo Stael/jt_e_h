@@ -1,4 +1,4 @@
-package ThreadUtils;
+package HuffmanCompressor.ThreadUtils;
 
 /**
  * User: thibaultramires

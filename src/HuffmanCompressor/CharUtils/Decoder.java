@@ -1,17 +1,15 @@
-package CharUtils;
+package HuffmanCompressor.CharUtils;
 
-import BitManagement.BitArray;
-import BitManagement.BitExtractor;
-import CharUtils.CharDecoder.CharDecoder;
-import HuffmanTree.HuffmanTree;
-import HuffmanTree.TreeBuilder;
-import IO.FileReader;
-import Utils.StatusPrinter;
+import HuffmanCompressor.BitManagement.BitExtractor;
+import HuffmanCompressor.CharUtils.CharDecoder.CharDecoder;
+import HuffmanCompressor.HuffmanTree.HuffmanTree;
+import HuffmanCompressor.HuffmanTree.TreeBuilder;
+import HuffmanCompressor.IO.FileReader;
+import HuffmanCompressor.Utils.StatusPrinter;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

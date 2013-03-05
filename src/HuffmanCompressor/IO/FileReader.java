@@ -1,6 +1,4 @@
-package IO;
-
-import CharUtils.Encoder;
+package HuffmanCompressor.IO;
 
 import java.io.IOException;
 import java.nio.file.Files;
