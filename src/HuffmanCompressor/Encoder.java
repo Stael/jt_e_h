@@ -1,11 +1,4 @@
-package HuffmanCompressor.CharUtils;
-
-import HuffmanCompressor.BitManagement.BitArray;
-import HuffmanCompressor.CharUtils.CharCounter.CharCounter;
-import HuffmanCompressor.CharUtils.CharEncoder.CharEncoder;
-import HuffmanCompressor.HuffmanTree.HuffmanTree;
-import HuffmanCompressor.IO.FileReader;
-import HuffmanCompressor.Utils.StatusPrinter;
+package HuffmanCompressor;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,7 +11,7 @@ import java.util.List;
  * Date: 23/02/13
  * Time: 13:02
  */
-public class Encoder {
+class Encoder {
     private String pathOfTheFileToEncode;
     private String pathOfTheEncodedFile;
     private String serializedTree;
@@ -32,32 +25,24 @@ public class Encoder {
         this.pathOfTheEncodedFile = pathOfTheEncodedFile;
     }
 
+    /*
+        Encodage du fichier
+     */
     public void encode() {
         initialStart = System.currentTimeMillis();
         start = System.currentTimeMillis();
 
-        byte[] byteArray = FileReader.extractTextFromFile(pathOfTheFileToEncode);
+        byte[] byteArray = FileReader.readFile(pathOfTheFileToEncode);
 
         StatusPrinter.printStatus("Fin de la lecture du fichier à encoder", start);
         start = System.currentTimeMillis();
 
-        System.gc();
-
-        StatusPrinter.printStatus("Fin GC", start);
-        start = System.currentTimeMillis();
-
         textToEncode = explodeByteArray(byteArray);
-        byteArray = null;
 
         StatusPrinter.printStatus("Fin de la découpe du fichier", start);
         start = System.currentTimeMillis();
 
-        System.gc();
-
-        StatusPrinter.printStatus("Fin GC", start);
-        start = System.currentTimeMillis();
-
-        CharFrequency[] charFrequency = countNumberOfCharacters(textToEncode);
+        CharFrequency[] charFrequency = countNumberOfCharacters(byteArray);
 
         StatusPrinter.printStatus("Fin du comptage du nombre d'occurences", start);
         start = System.currentTimeMillis();
@@ -73,11 +58,6 @@ public class Encoder {
         StatusPrinter.printStatus("Fin de l'encodage du fichier", start);
         start = System.currentTimeMillis();
 
-        System.gc();
-
-        StatusPrinter.printStatus("Fin GC", start);
-        start = System.currentTimeMillis();
-
         saveCompressedFile(encodedText);
 
         StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
@@ -87,12 +67,12 @@ public class Encoder {
     private List<byte[]> explodeByteArray(byte[] byteArray) {
         int byteArrayLength = byteArray.length;
 
-        int nbThread = 8;
+        int nbThread = Runtime.getRuntime().availableProcessors();
         List<byte[]> textToEncode = new ArrayList<byte[]>();
 
         int startIndice = 0;
-        for(int i = 0; i < nbThread; i++) {
-            int stopIndice = startIndice + (int) Math.ceil(byteArrayLength/nbThread) + 1;
+        for (int i = 0; i < nbThread; i++) {
+            int stopIndice = startIndice + (int) Math.ceil(byteArrayLength / nbThread) + 1;
             stopIndice = stopIndice > byteArrayLength ? byteArrayLength : stopIndice;
             textToEncode.add(Arrays.copyOfRange(byteArray, startIndice, stopIndice));
             startIndice = stopIndice;
@@ -100,14 +80,30 @@ public class Encoder {
         return textToEncode;
     }
 
-    public CharFrequency[] countNumberOfCharacters(List<byte[]> textToEncode) {
-        start = System.currentTimeMillis();
+    /*
+        Comptage de la du nombre d'occurence de chaque carractère
+     */
+    public CharFrequency[] countNumberOfCharacters(byte[] byteArray) {
+        // Initialisation du tableau de fréquence
+        CharFrequency[] charFrequency = new CharFrequency[256];
+        for (int i = 0; i < 256; i++) {
+            charFrequency[i] = new CharFrequency((char) i);
+        }
 
-        CharCounter cc = new CharCounter(textToEncode);
-        return cc.countMono();
+        // Comptage du nombre d'occurence
+        int length = byteArray.length;
+        for (int i = 0; i < length; i++) {
+            if ((int) byteArray[i] >= 0)
+                charFrequency[(int) byteArray[i]].up();
+        }
+
+        return charFrequency;
 
     }
 
+    /*
+        Encodage multi threadé du fichier
+     */
     public BitArray[] encodeText(CharFrequency[] charFrequency) {
         CharEncoder ce = new CharEncoder(textToEncode, charFrequency);
         textToEncode = null;
@@ -115,39 +111,70 @@ public class Encoder {
         return ce.encodeMulti();
     }
 
+    /*
+        Sauvegarde de la version compressée du fichier
+     */
     public void saveCompressedFile(BitArray[] encodedText) {
         try {
+            // On crée les dossiers parents si ils n'existent pas
             File f = new File(pathOfTheEncodedFile);
-            while(!f.getParentFile().exists()) {
+            while (!f.getParentFile().exists()) {
                 f.getParentFile().mkdirs();
                 f = f.getParentFile();
             }
 
             FileOutputStream out = new FileOutputStream(pathOfTheEncodedFile);
 
-            StringBuffer textPartHeader = new StringBuffer();
-            for(int i = 0; i < encodedText.length; i++) {
-                textPartHeader.append('>');
-                textPartHeader.append(encodedText[i].getLastByte());
-                textPartHeader.append(':');
-                textPartHeader.append(encodedText[i].getLastBit());
-                textPartHeader.append('.');
-            }
-            textPartHeader.append("--");
+            StringBuffer textPartHeader = createFirstPartOfTheHeader(encodedText);
 
+            // On écrit la taille de la 1ère partie de l'en-tête
+            out.write(intToByteArray(textPartHeader.toString().length()));
+
+            // On écrit la première partie de l'en-tête
             out.write(textPartHeader.toString().getBytes());
 
+            // On écrit la taille de la 2nd partie de l'en-tête
+            out.write(intToByteArray(serializedTree.getBytes().length));
+
+            // On écrit la seconde partie de l'en-tête
             out.write(serializedTree.getBytes());
 
-            for(int i = 0; i < encodedText.length; i++) {
+            // On écrit toutes les sous parties du texte compressé
+            for (int i = 0; i < encodedText.length; i++) {
                 out.write(encodedText[i].toByteArray());
             }
 
             out.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (Exception e) {
+            System.out.println("Une erreur est survenue à l'écriture du fichier");
             System.exit(-1);
         }
+    }
+
+    /*
+        Création de la première partie de l'en-tête
+        qui contient les caractéristiques des sous partie de la version
+        encodée du texte
+     */
+    private StringBuffer createFirstPartOfTheHeader(BitArray[] encodedText) {
+        StringBuffer textPartHeader = new StringBuffer();
+        for (int i = 0; i < encodedText.length; i++) {
+            textPartHeader.append(encodedText[i].getLastByte());
+            textPartHeader.append(':');
+            textPartHeader.append(encodedText[i].getLastBit());
+        }
+        return textPartHeader;
+    }
+
+    /*
+        Conversion d'un int (d'une taille maximal de 2^16 - 1)
+        en tableau de byte
+     */
+    public byte[] intToByteArray(int value) {
+        return new byte[]{
+                (byte) (value >>> 8),
+                (byte) value
+        };
     }
 }

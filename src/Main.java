@@ -1,5 +1,4 @@
-import HuffmanCompressor.CharUtils.Decoder;
-import HuffmanCompressor.CharUtils.Encoder;
+import HuffmanCompressor.HuffmanCompressor;
 
 public class Main {
 
@@ -23,12 +22,10 @@ public class Main {
             }
 
             if(args[0].equals("encode")) {
-                Encoder encoder = new Encoder(args[1], args[2]);
-                encoder.encode();
+                HuffmanCompressor.compress(args[1], args[2]);
             }
             else if(args[0].equals("decode")) {
-                Decoder decoder = new Decoder(args[1], args[2]);
-                decoder.decode();
+                HuffmanCompressor.decompress(args[1], args[2]);
             }
             else {
                 System.out.println("Premier argument invalide");

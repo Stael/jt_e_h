@@ -1,9 +1,5 @@
-package HuffmanCompressor.HuffmanTree;
+package HuffmanCompressor;
 
-import HuffmanCompressor.CharUtils.CharFrequency;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.PriorityQueue;
 
 /**
@@ -11,57 +7,46 @@ import java.util.PriorityQueue;
  * Date: 27/02/13
  * Time: 18:02
  */
-public class HuffmanTree {
+class HuffmanTree {
     private HuffmanNode root;
-    private HashMap<Character, CharFrequency> characterMap = new HashMap<Character, CharFrequency>();
 
-    public HuffmanTree(HuffmanNode root) {
-        this.root = root;
-    }
-
-    public HuffmanTree() {
-    }
-
-    public void generateCode() {
-        root.generateCode("");
-    }
-
-    public String charAndLength() {
-        return root.charAndLength() + "..";
-    }
-
-    public HashMap<Character, CharFrequency> regeneration(String serializedTree) {
+    /*
+        Création de l'arbre de Huffman grâce à sa version "texte"
+     */
+    public HuffmanTree(String serializedTree) {
         root = new HuffmanNode();
 
         int i = 0;
-        while(i < serializedTree.length()) {
+        while (i < serializedTree.length()) {
 
             char c = serializedTree.charAt(i);
             i++;
 
             StringBuffer length = new StringBuffer();
-            while(i < serializedTree.length() && serializedTree.charAt(i) != '.') {
+            while (i < serializedTree.length() && serializedTree.charAt(i) != '.') {
                 length.append(serializedTree.charAt(i));
                 i++;
             }
             i++;
+
             int charLength = Integer.parseInt(length.toString());
 
             CharFrequency cf = new CharFrequency(c);
 
-            characterMap.put(c, cf);
             root.regenerate(cf, charLength, 0);
         }
 
         generateCode();
-
-        return characterMap;
     }
 
+    /*
+        Création de l'arbre de Huffman à partir du tableau de fréquences
+     */
     public HuffmanTree(CharFrequency[] charFrequency) {
         PriorityQueue<HuffmanNode> prioQueue = new PriorityQueue<HuffmanNode>();
-        for (int i = 0; i < 256; i ++) {
-            prioQueue.add(new HuffmanNode(charFrequency[i]));
+        for (int i = 0; i < 256; i++) {
+            if (charFrequency[i].getNbOccurence() > 0)
+                prioQueue.add(new HuffmanNode(charFrequency[i]));
         }
 
         while (prioQueue.size() > 1) {
@@ -76,6 +61,21 @@ public class HuffmanTree {
         root = prioQueue.poll();
         generateCode();
     }
+
+    /*
+        Génération du code de chaque caractère
+     */
+    public void generateCode() {
+        root.generateCode("");
+    }
+
+    /*
+        Génération de la version "texte" d'un arbre
+     */
+    public String charAndLength() {
+        return root.charAndLength();
+    }
+
 
     public HuffmanNode getRoot() {
         return root;

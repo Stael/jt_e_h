@@ -1,14 +1,6 @@
-package HuffmanCompressor.CharUtils.CharEncoder;
+package HuffmanCompressor;
 
 
-import HuffmanCompressor.BitManagement.BitArray;
-import HuffmanCompressor.CharUtils.CharCounter.CharCounterThread;
-import HuffmanCompressor.CharUtils.CharFrequency;
-import HuffmanCompressor.CharUtils.Encoder;
-import HuffmanCompressor.ThreadUtils.ThreadCompleteListener;
-import HuffmanCompressor.Utils.StatusPrinter;
-
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -16,7 +8,7 @@ import java.util.List;
  * Date: 21/02/13
  * Time: 21:48
  */
-public class CharEncoder implements ThreadCompleteListener {
+class CharEncoder implements ThreadCompleteListener {
     private List<byte[]> textToEncode;
     private CharFrequency[] charFrequency;
     private BitArray[] partialEncodedTexts;
@@ -30,6 +22,9 @@ public class CharEncoder implements ThreadCompleteListener {
         this.nbThread = textToEncode.size();
     }
 
+    /*
+        Compression en restant dans le "thread principal"
+     */
     public BitArray[] encodeMono() {
         partialEncodedTexts = new BitArray[nbThread];
 
@@ -42,25 +37,29 @@ public class CharEncoder implements ThreadCompleteListener {
         return partialEncodedTexts;
     }
 
+    /*
+        Compression multi-threadé
+     */
     public BitArray[] encodeMulti() {
+        // Création et lancement des threads
+
         partialEncodedTexts = new BitArray[nbThread];
         CharEncoderThread[] threads = new CharEncoderThread[nbThread];
 
         for (int i = 0; i < nbThread; i++) {
-            threads[i] =  new CharEncoderThread(textToEncode.get(i), charFrequency, i);
+            threads[i] = new CharEncoderThread(textToEncode.get(i), charFrequency, i);
             threads[i].addListener(this);
             threads[i].start();
         }
 
-        textToEncode = null;
-
+        // Attente de la fin de l'execution de chaque thread
         try {
             for (int i = 0; i < nbThread; i++) {
                 threads[i].join();
             }
-        }
-        catch (Exception e) {
-            System.out.println("yolo");
+        } catch (Exception e) {
+            System.out.println("Une erreur est survenue");
+            System.exit(-1);
         }
 
         return partialEncodedTexts;
