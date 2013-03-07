@@ -11,8 +11,6 @@ public class Main {
                 3ème argument : fichié encodé / décodé
          */
 
-        args[1] = "files/file12.txt";
-
         if(args.length == 3) {
             if(!args[1].matches("^//")) {
                 args[1] = System.getProperty("user.dir") + "/" + args[1];
