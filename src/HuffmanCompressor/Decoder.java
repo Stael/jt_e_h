@@ -85,15 +85,18 @@ class Decoder {
 
             partNumber++;
 
-            start = stop;
+            start = stop + 1;
         }
 
-        String treeHeader = new String(Arrays.copyOfRange(byteArray, firstPartHeaderLength + 4, firstPartHeaderLength + secondPartHeaderLength + 4));
+        String treeHeader = new String(Arrays.copyOfRange(byteArray, firstPartHeaderLength + 4, firstPartHeaderLength + secondPartHeaderLength + 3));
         tree = new HuffmanTree(treeHeader);
+        String test = tree.charAndLength();
+
+        return ;
     }
 
     public BitArray[] decodeText() {
-        CharDecoder cd = new CharDecoder(ArrayOfBitExtractor, tree, this);
+        CharDecoder cd = new CharDecoder(ArrayOfBitExtractor, tree);
         return cd.decodeMulti();
     }
 
@@ -109,8 +112,10 @@ class Decoder {
             for (int i = 0; i < decodedText.length; i++) {
                 out.write(decodedText[i].toByteArray());
             }
-        } catch (Exception e) {
-            System.out.println("Yolo !");
+        }
+        catch (Exception e) {
+            System.out.println("Une erreur est survenue à l'écriture du fichier");
+            System.exit(-1);
         }
     }
 }

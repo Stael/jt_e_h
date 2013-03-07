@@ -22,6 +22,7 @@ class CharDecoderThread extends NotifyingThread {
         decodedText = new BitArray(bitExtractor.lastByte);
     }
 
+    @Override
     public void doRun() {
         decode();
     }
@@ -35,12 +36,12 @@ class CharDecoderThread extends NotifyingThread {
 
             // On se déplace dans l'arbre en fonction de la valeur de bit extrait
             if (bitExtractor.next()) {
-                parc = parc.getLeft();
-            } else {
                 parc = parc.getRight();
+            } else {
+                parc = parc.getLeft();
             }
 
-            // Quand on est arrivé à la racine, on ajoute le caractère dans un BitArray
+            // Quand on est arrivé à la racine, on ajoute le caractère dans le BitArray
             // et on recommence
             if (parc.isLeaf()) {
                 decodedText.add(parc.getCf().getCharacter());

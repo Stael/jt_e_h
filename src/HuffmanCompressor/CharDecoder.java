@@ -12,7 +12,7 @@ class CharDecoder implements ThreadCompleteListener {
 
     private int nbThread;
 
-    public CharDecoder(BitExtractor[] arrayOfBitExtractor, HuffmanTree tree, Decoder decoder) {
+    public CharDecoder(BitExtractor[] arrayOfBitExtractor, HuffmanTree tree) {
         this.arrayOfBitExtractor = arrayOfBitExtractor;
         this.tree = tree;
         nbThread = arrayOfBitExtractor.length;
@@ -33,8 +33,10 @@ class CharDecoder implements ThreadCompleteListener {
             for (int i = 0; i < nbThread; i++) {
                 threads[i].join();
             }
-        } catch (Exception e) {
-            System.out.println("yolo");
+        }
+        catch (Exception e) {
+            System.out.println("Une erreur est survenue");
+            System.exit(-1);
         }
 
         return decodedText;

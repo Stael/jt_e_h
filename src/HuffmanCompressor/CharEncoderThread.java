@@ -22,6 +22,7 @@ class CharEncoderThread extends NotifyingThread {
         this.threadNumber = threadNumber;
     }
 
+    @Override
     public void doRun() {
         encode();
     }
