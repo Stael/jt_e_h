@@ -66,13 +66,16 @@ class BitArray {
      */
     public void add(boolean bit) {
 
+        // On décale nos bits et on ajout le nouveau bit
         bitArray[lastByte] = (byte) ((bitArray[lastByte] << 1) | (bit ? 1 : 0));
 
+        // En cas de fin de byte, on passe au byte suivant
         if (lastBit == 7) {
 
             lastByte++;
             lastBit = 0;
 
+            // Si on a atteint la dernier byte, on double la capacité
             if (lastByte == bitArrayLength) {
                 extendCapacity(2);
             }

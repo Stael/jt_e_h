@@ -42,13 +42,15 @@ class CharEncoder implements ThreadCompleteListener {
      */
     public BitArray[] encodeMulti() {
         // Création et lancement des threads
-
         partialEncodedTexts = new BitArray[nbThread];
         CharEncoderThread[] threads = new CharEncoderThread[nbThread];
 
         for (int i = 0; i < nbThread; i++) {
+            // Création du thread
             threads[i] = new CharEncoderThread(textToEncode.get(i), charFrequency, i);
+            // On ajoute cette classe comme listener
             threads[i].addListener(this);
+            // On lance le thread
             threads[i].start();
         }
 

@@ -19,16 +19,24 @@ class CharDecoder implements ThreadCompleteListener {
         decodedText = new BitArray[nbThread];
     }
 
+    /*
+        Décompression multi-threadé
+     */
     public BitArray[] decodeMulti() {
+        // Création et lancement des threads
         CharDecoderThread[] threads = new CharDecoderThread[nbThread];
 
         for (int i = 0; i < nbThread; i++) {
+            // Création du thread
             threads[i] = new CharDecoderThread(arrayOfBitExtractor[i], tree, i);
+            // On ajoute cette classe comme listener
             threads[i].addListener(this);
+            // On lance le thread
             threads[i].start();
         }
         arrayOfBitExtractor = null;
 
+        // Attente de la fin de l'execution de chaque thread
         try {
             for (int i = 0; i < nbThread; i++) {
                 threads[i].join();

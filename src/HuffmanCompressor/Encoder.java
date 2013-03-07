@@ -29,52 +29,70 @@ class Encoder {
         Encodage du fichier
      */
     public void encode() {
-        initialStart = System.currentTimeMillis();
-        start = System.currentTimeMillis();
+        try {
+            initialStart = System.currentTimeMillis();
+            start = System.currentTimeMillis();
 
-        byte[] byteArray = FileReader.readFile(pathOfTheFileToEncode);
+            byte[] byteArray = FileReader.readFile(pathOfTheFileToEncode);
 
-        StatusPrinter.printStatus("Fin de la lecture du fichier à encoder", start);
-        start = System.currentTimeMillis();
+            StatusPrinter.printStatus("Fin de la lecture du fichier à encoder", start);
+            start = System.currentTimeMillis();
 
-        textToEncode = explodeByteArray(byteArray);
+            textToEncode = explodeByteArray(byteArray);
 
-        StatusPrinter.printStatus("Fin de la découpe du fichier", start);
-        start = System.currentTimeMillis();
+            StatusPrinter.printStatus("Fin de la découpe du fichier", start);
+            start = System.currentTimeMillis();
 
-        CharFrequency[] charFrequency = countNumberOfCharacters(byteArray);
+            CharFrequency[] charFrequency = countNumberOfCharacters(byteArray);
 
-        StatusPrinter.printStatus("Fin du comptage du nombre d'occurences", start);
-        start = System.currentTimeMillis();
+            StatusPrinter.printStatus("Fin du comptage du nombre d'occurences", start);
+            start = System.currentTimeMillis();
 
-        HuffmanTree huffmanTree = new HuffmanTree(charFrequency);
-        serializedTree = huffmanTree.charAndLength();
+            HuffmanTree huffmanTree = new HuffmanTree(charFrequency);
+            serializedTree = huffmanTree.charAndLength();
 
-        StatusPrinter.printStatus("Fin de la création de l'arbre", start);
-        start = System.currentTimeMillis();
+            StatusPrinter.printStatus("Fin de la création de l'arbre", start);
+            start = System.currentTimeMillis();
 
-        BitArray[] encodedText = encodeText(charFrequency);
+            BitArray[] encodedText = encodeText(charFrequency);
 
-        StatusPrinter.printStatus("Fin de l'encodage du fichier", start);
-        start = System.currentTimeMillis();
+            StatusPrinter.printStatus("Fin de l'encodage du fichier", start);
+            start = System.currentTimeMillis();
 
-        saveCompressedFile(encodedText);
+            saveCompressedFile(encodedText);
 
-        StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
-        StatusPrinter.printStatus("Fin de l'encodage", initialStart);
+            StatusPrinter.printStatus("Fin de l'écriture du fichier encodé", start);
+            StatusPrinter.printStatus("Fin de l'encodage", initialStart);
+        }
+        catch (Exception e) {
+            System.out.println("Une exception est survenue lors de la compression");
+            System.exit(-1);
+        }
     }
 
+    /*
+        On éclate notre fichier en sous parties.
+        Cela pourait être évité en manipulant uniquement le tableau de byte représentant le fichier
+        et en jouant directement sur les indices, comme fait dans le décodage.
+        Cela n'a pu être optimisé faute de temps
+     */
     private List<byte[]> explodeByteArray(byte[] byteArray) {
         int byteArrayLength = byteArray.length;
 
+        // On découpe le fichier en le nombre de coeurs disponibles.
+        // On aurait pu optimiser le nombre de threads en fonction de la taille du fichier
         int nbThread = Runtime.getRuntime().availableProcessors();
         List<byte[]> textToEncode = new ArrayList<byte[]>();
 
+        // Découpe du fichier
         int startIndice = 0;
         for (int i = 0; i < nbThread; i++) {
+            // Calcul des indices de début et de fin de la sous partie
             int stopIndice = startIndice + (int) Math.ceil(byteArrayLength / nbThread) + 1;
             stopIndice = stopIndice > byteArrayLength ? byteArrayLength : stopIndice;
+            // Copie de la sous partie
             textToEncode.add(Arrays.copyOfRange(byteArray, startIndice, stopIndice));
+
             startIndice = stopIndice;
         }
         return textToEncode;
@@ -140,6 +158,8 @@ class Encoder {
             out.write(serializedTree.getBytes());
 
             // On écrit toutes les sous parties du texte compressé
+            // Cela permet d'éviter d'avoir à les fusionner en un seul tableau de byte
+            // ce qui réduirait très fortement les performances
             for (int i = 0; i < encodedText.length; i++) {
                 out.write(encodedText[i].toByteArray());
             }

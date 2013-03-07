@@ -8,6 +8,7 @@ class FileReader {
     /*
         Lecture de tout un fichier et sauvegarde de ce fichier
         dans un tableau de byte
+        Plus rapide que de faire Files.readAllBytes
      */
     public static final byte[] readFile(String file) {
 

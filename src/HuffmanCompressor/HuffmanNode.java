@@ -37,34 +37,52 @@ class HuffmanNode implements Comparable<HuffmanNode> {
         à gauche possible à la bonne hauteur
      */
     public boolean regenerate(CharFrequency cf, int hauteur, int currentHauteur) {
+        // Si le noeud est déjà une feuille, on ne peut pas insérer ici
         if (isLeaf()) {
             return false;
         }
 
+        // Si on a atteint un père possible
         if (currentHauteur == hauteur - 1) {
+            // Si le fils gauche est disponible on s'insère dedans
             if (left == null) {
                 left = new HuffmanNode(cf);
                 return true;
-            } else if (right == null) {
+            }
+            // Sinon, si le fils droit est disponible on s'insère dedans
+            else if (right == null) {
                 right = new HuffmanNode(cf);
                 return true;
-            } else {
+            }
+            // Sinon, c'est qu'on ne peut pas s'insérer ici
+            else {
                 return false;
             }
         } else {
+            // Si on est pas sur un père possible
+            // On essaye de descendre à gauche
+            // Si le fils gauche n'existe pas, on le crée, et on est sur de pouvoir s'insérer ensuite dans un de ses fils
             if (left == null) {
                 left = new HuffmanNode();
                 left.regenerate(cf, hauteur, currentHauteur + 1);
                 return true;
-            } else {
+            }
+            // Si le fils gauche existe
+            else {
+                // On regarde si on peut s'insérer dans un de ses fils
                 if (left.regenerate(cf, hauteur, currentHauteur + 1)) {
                     return true;
-                } else {
+                }
+                // Si on ne peut pas s'insérer dans un des fils du fils gauche, on essaye à droite
+                else {
+                    // Si le fils droit n'existe pas, on le crée, et on est sur de pouvoir s'insérer ensuite dans un de ses fils
                     if (right == null) {
                         right = new HuffmanNode();
                         right.regenerate(cf, hauteur, currentHauteur + 1);
                         return true;
-                    } else {
+                    }
+                    // Sinon, on s'insère dans un des fils du fils droit
+                    else {
                         return right.regenerate(cf, hauteur, currentHauteur + 1);
                     }
                 }
